@@ -1,0 +1,22 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: vladimirkutuev/cmocka:latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and test source code
+        run: |
+         mkdir -p cmake_build && \
+         cd ./cmake_build && \
+         cmake .. && \
+         make && \
+         ctest --verbose
+

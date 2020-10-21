@@ -1,0 +1,13 @@
+pull_request_rules:
+  - name: Ready to grading test
+    conditions:
+      - base=master
+      - -title~=(?i)wip
+      - label!=work-in-progress
+      - -draft
+      - -conflict
+      - status-success=test
+    actions:
+      merge:
+          method: merge
+
