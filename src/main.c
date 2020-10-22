@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
         unsorted_numbers[i] = numbers[i];
     sort(numbers, amount_of_numbers);
     int changed_position = 0;
-    for (int i = 0; i < amount_of_numbers; i++) {
+    for (size_t i = 0; i < amount_of_numbers; i++) {
         if (numbers[i] != unsorted_numbers[i])
             changed_position++;
     }
