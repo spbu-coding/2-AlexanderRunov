@@ -5,9 +5,9 @@
 
 #define MAX_NUMBER_COUNT 100
 
-extern void sort(long long *numbers, int numbers_amount);
+extern void sort(int *numbers, int numbers_amount);
 
-int parse_params(int argc, char **argv, long long *to, long long *from, bool *get_to, bool *get_from) {
+int parse_params(int argc, char **argv, int *to, int *from, bool *get_to, bool *get_from) {
     if (argc <= 1) return -1;
     if (argc > 3) return -2;
     char pref_from[] = "--from=";
@@ -32,39 +32,47 @@ int parse_params(int argc, char **argv, long long *to, long long *from, bool *ge
     return -4;
 }
 
-int get_numbers(long long *numbers, long long to, long long from, bool get_to, bool get_from) {
+int get_numbers(int *first_array, int *second_array, int to, int from, bool get_to, bool get_from) {
     int numbers_amount = 0;
-    long long read_element;
-    int read_check = scanf("%lld", &read_element);
+    int read_element = 0;
+    int read_check = scanf("%d", &read_element);
     while (read_check != EOF) {
-        if (read_element <= from && get_from) {
-            fprintf(stdout, "%lld ", read_element);
+        if(read_check == 1) {
+            if(read_element <= from && get_from) {
+                fprintf(stdout, "%d ", read_element);
+            }
+            if(read_element >= to && get_to) {
+                fprintf(stderr, "%d ", read_element);
+            }
+            if((read_element > from || !get_from) && (read_element < to || !get_to)) {
+                first_array[numbers_amount] = read_element;
+                second_array[numbers_amount] = read_element;
+                numbers_amount++;
+            }
+        } else {
+            return -5;
         }
-        if (read_element >= to && get_to) {
-            fprintf(stderr, "%lld ", read_element);
-        }
-        if ((read_element > from || !get_from) && (read_element < to || !get_to)) {
-            numbers[numbers_amount] = read_element;
-            numbers_amount++;
-        }
-        read_check = scanf("%lld", &read_element);
+        read_check = scanf("%d", &read_element);
     }
     return numbers_amount;
 }
 
 
 int main(int argc, char **argv) {
-    long long to = 0;
-    long long from = 0;
+    int to = 0;
+    int from = 0;
     bool get_to = false;
     bool get_from = false;
     int parse_check = parse_params(argc, argv, &to, &from, &get_to, &get_from);
     if (parse_check < 0) return parse_check;
-    long long numbers[MAX_NUMBER_COUNT];
-    size_t amount_of_numbers = get_numbers(numbers, to, from, get_to, get_from);
-    long long unsorted_numbers[MAX_NUMBER_COUNT];
-    for (size_t i = 0; i < amount_of_numbers; i++)
+
+    int numbers[MAX_NUMBER_COUNT];
+    int unsorted_numbers[MAX_NUMBER_COUNT];
+    int amount_of_numbers = get_numbers(numbers, unsorted_numbers, to, from, get_to, get_from);
+
+    for (int i = 0; i < amount_of_numbers; i++)
         unsorted_numbers[i] = numbers[i];
+
     sort(numbers, amount_of_numbers);
     int changed_position = 0;
     for (int i = 0; i < amount_of_numbers; i++) {
