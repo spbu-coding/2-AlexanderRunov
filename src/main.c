@@ -1,35 +1,51 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdlib.h>
 
 #define MAX_NUMBER_COUNT 100
 
 extern void sort(int *numbers, int numbers_amount);
+
+int convert_to_int(char *str, int begin) {
+    int n = 0;
+    int sign = 1;
+    for(size_t i = begin; i < strlen(str); i++) {
+        if(n == 0 && str[i] == '-') {
+            sign = -1;
+        } else if(str[i] <='9' && str[i] >= '0') {
+            n = n * 10 + str[i] - '0';
+        } else {
+            return n * sign;
+        }
+    }
+    return n * sign;
+}
 
 int parse_params(int argc, char **argv, int *to, int *from, bool *get_to, bool *get_from) {
     if (argc <= 1) return -1;
     if (argc > 3) return -2;
     char pref_from[] = "--from=";
     char pref_to[] = "--to=";
+    int correct_params = 0;
     size_t pref_from_length = strlen(pref_from);
     size_t pref_to_length = strlen(pref_to);
-    for (int i = 1; i < argc; i++) {
-        char *pointer_begin = argv[i];
-        char *pointer_end = argv[i] + strlen(argv[i]);
-        if (strncmp(argv[i], pref_from, pref_from_length) == 0) {
-            if (*get_from) return -3;
-            *get_from = true;
-            *from = strtol(pointer_begin + pref_from_length, &pointer_end, 10);
-        }
-        if (strncmp(argv[i], pref_to, pref_to_length) == 0) {
-            if (*get_to) return -3;
-            *get_to = true;
-            *to = strtol(pointer_begin + pref_to_length, &pointer_end, 10);
+    for(int i = 1; i < argc; i++) {
+        if(strncmp(argv[i], pref_from, pref_from_length) == 0) {
+            if(!(*get_from)) {
+                *from = convert_to_int(argv[i], pref_from_length);
+                correct_params++;
+                *get_from = true;
+            } else return -3;
+        } else if(strncmp(argv[i], pref_to, pref_to_length) == 0) {
+            if(!(*get_to)) {
+                *to = convert_to_int(argv[i], pref_to_length);
+                correct_params++;
+                *get_to = true;
+            } else return -3;
         }
     }
-    if (get_to || get_from) return 1;
-    return -4;
+    if(correct_params == 0) return -4;
+    return 1;
 }
 
 int get_numbers(int *first_array, int *second_array, int to, int from, bool get_to, bool get_from) {
@@ -64,7 +80,9 @@ int main(int argc, char **argv) {
     bool get_to = false;
     bool get_from = false;
     int parse_check = parse_params(argc, argv, &to, &from, &get_to, &get_from);
-    if (parse_check < 0) return parse_check;
+    if (parse_check != 1) {
+        return parse_check;
+    }
 
     int numbers[MAX_NUMBER_COUNT];
     int unsorted_numbers[MAX_NUMBER_COUNT];
